@@ -1,0 +1,5 @@
+(library
+ (name preempt)
+ (foreign_stubs
+  (language c)
+  (names preempt_stubs)))
