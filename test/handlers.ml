@@ -13,8 +13,8 @@ let[@no_inline] with_effects_handler ~yielded_f f =
     match e with
     | Yield -> 
       Some (fun (k : (a, unit) continuation) ->
-        Printf.printf "in effects handler\n";
-        Stdlib.flush_all ();        
+        (*Printf.printf "in effects handler\n";
+        Stdlib.flush_all (); *)
         yielded_f (); continue k ())
     | _ -> 
       Printf.printf "wrong handler\n";

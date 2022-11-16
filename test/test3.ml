@@ -9,18 +9,18 @@ let () =
         Handlers.with_effects_handler
           ~yielded_f:(fun () ->
             (* reinstall our handler (I think OCaml runtime might be resetting its own in some cases) *)
-            Preempt.setup Handlers.Yield;
-            Printf.printf "got control!\n";
-            Stdlib.flush_all ();
+            (* Printf.printf "got control!\n";
+            Stdlib.flush_all (); *)
             write_something := true)
           (fun () ->
             Preempt.setup Handlers.Yield;
             Atomic.set id (Some (Preempt.thread_id ()));
             while true do
-              counter := Sys.opaque_identity (!counter + 1);
               if !write_something then (
-                Printf.printf "\n!!!got back in!!!\n";
+                counter := Sys.opaque_identity (!counter + 1);
+                Printf.printf "\n!!!got back in (n:%d)!!!\n" !counter;
                 Stdlib.flush_all ();
+                Preempt.setup Handlers.Yield; 
                 write_something := false);
             done))
   in
