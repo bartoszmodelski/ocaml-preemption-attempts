@@ -1,20 +1,31 @@
 let log s = 
-  Printf.printf "%s" s;
+  Printf.printf "%s\n" s;
   Stdlib.flush_all ();;
 
-let install_handler () = 
-  Sys.signal Sys.sigurg (Sys.Signal_handle (fun _ -> log "got signal!")) 
-  |> ignore;;
 
+let do_stuff () = while true do Stdlib.flush_all () done;;
+let work () = 
+  Handlers.with_effects_handler 
+    ~yielded_f:(fun () -> log "yielded!")
+    (fun () ->
+      do_stuff ())
+
+let install_handler () = 
+  Sys.signal Sys.sigurg (Sys.Signal_handle (fun _ -> 
+    log "in signal handler";
+    work ();
+    log "leaving signal handler")) 
+  |> ignore;;
 
 
 let new_domain () =  
   let thread_id = Atomic.make None in 
   Domain.spawn (fun () -> 
-    let my_id = Preempt.thread_id () in 
+    Domain.at_exit (fun () -> log "died");
     install_handler ();
+    let my_id = Preempt.thread_id () in 
     Atomic.set thread_id (Some my_id); 
-    while true do Stdlib.flush_all () done)
+    work ())
   |> Sys.opaque_identity |> ignore;
 
   while Option.is_none (Atomic.get thread_id) do () done;
@@ -25,6 +36,7 @@ let new_domain () =
 
 let () = 
   let thread_id = new_domain () in 
-  Stdlib.read_line () |> ignore; 
-  Preempt.send_signal thread_id;
-  while true do Stdlib.flush_all () done;;
+  while true do 
+    Stdlib.read_line () |> ignore; 
+    Preempt.send_signal thread_id;
+  done;;
