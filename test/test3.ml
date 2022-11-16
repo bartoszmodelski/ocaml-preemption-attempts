@@ -34,7 +34,7 @@ let () =
   | Some id ->
       while true do
         Printf.printf "awaiting keypress\n";
-        Stdlib.read_line () |> ignore;
+        Stdlib.read_line () |> ignore; 
         Preempt.send_signal id;
         Printf.printf "sent signal\n";
         Stdlib.flush_all ()

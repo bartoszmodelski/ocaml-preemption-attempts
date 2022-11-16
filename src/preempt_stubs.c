@@ -50,7 +50,7 @@ CAMLprim value install_handler(value user_eff)
 {
   yield_eff = user_eff;
 
-  struct sigaction psa;
+  struct sigaction psa = {};
   psa.sa_handler = sig_handler;
   // psa.sa_flags = SA_NODEFER;
   sigaction(SIGURG, &psa, NULL);
