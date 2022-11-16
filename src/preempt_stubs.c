@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <caml/mlvalues.h>
 #include <caml/callback.h>
+#include <caml/fiber.h>
 
 CAMLprim value thread_id()
 {
@@ -80,7 +81,7 @@ static void sig_handler2(int signo)
     caml_domain_state* domain_state = Caml_state;
     assert(domain_state);
     
-    //caml_maybe_expand_stack();
+    caml_maybe_expand_stack();
     
     value arg = Val_unit;
     caml_callback_asm(domain_state, closure, &arg);

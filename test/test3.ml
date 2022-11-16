@@ -8,6 +8,8 @@ let () =
     Domain.spawn (fun () ->
         Handlers.with_effects_handler
           ~yielded_f:(fun () ->
+            (* reinstall our handler (I think OCaml runtime might be resetting its own in some cases) *)
+            Preempt.setup Handlers.Yield;
             Printf.printf "got control!\n";
             Stdlib.flush_all ();
             write_something := true)
