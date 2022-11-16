@@ -25,9 +25,9 @@ The nice part here is that returning from C signal-frame after resumption is set
 
 Do all above, but don't try to perform effect from C. Instead, call OCaml closure performing an effect by invoking `caml_callback_asm` (to skip the pesky handlers-removing code). Here, resumption should not be this much different from normal order of things.
 
-**Works** (unless you allocate in the handler logic). Overall pretty promising given the amount of hackery. It fails quickly with gc error (`allocation failure during minor GC`) if the handler allocates memory. Otherwise, it segfaults at some point, which I think is expected, given that we may preempt while some critical runtime logic is happening. 
+**Works** (unless you allocate in the handler logic). Overall pretty promising given the amount of hackery. It fails quickly with gc error (`allocation failure during minor GC`) if the handler allocates memory. Otherwise, it segfaults at some point and that's expected, given that we're gonna occasionally have the signal arrive during the most critical runtime code.
 
-At some point here means  anywhere between 50 to 1000 preempts. Seems like exp distribution, so a good sign. 
+At some point here means anywhere between 50 to 1000 preempts. Seems like exp distribution, so a good sign. 
 
 # Not tried
 

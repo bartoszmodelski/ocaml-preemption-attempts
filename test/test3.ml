@@ -32,9 +32,10 @@ let () =
   match Atomic.get id with
   | None -> assert false
   | Some id ->
+      Printf.printf "awaiting keypress\n";
+      Stdlib.read_line () |> ignore; 
       while true do
-        Printf.printf "awaiting keypress\n";
-        Stdlib.read_line () |> ignore; 
+        Unix.sleepf 0.001;
         Preempt.send_signal id;
         Printf.printf "sent signal\n";
         Stdlib.flush_all ()
