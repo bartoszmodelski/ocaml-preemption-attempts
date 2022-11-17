@@ -34,7 +34,7 @@ let () =
       Printf.printf "awaiting keypress\n";
       Stdlib.read_line () |> ignore; 
       while true do
-        Unix.sleepf 0.0001;
+        Unix.sleepf 0.001;
         Preempt.send_signal id;
         Printf.printf "sent signal\n";
         Stdlib.flush_all ();
