@@ -9,7 +9,7 @@ Unhandled effect. Runtime purposefully removes effect handlers when entering OCa
 
 Unhandled effect. As above. 
 
-Something that works here is to call `finalise_release` and re-enter the scheduler to run the next task. But that can only be done a limited number of times before we blow through the stack limit. Also tasks buried under a never-yielding stack are not accessible. 
+Something that works here is to call `finalise_release` and re-enter the scheduler to run the next task. But that's going to blow through the stack and tasks buried under a never-yielding stack are inaccessible. 
 
 ## Perform effect in true signal handler
 
