@@ -1,4 +1,4 @@
-# Log documenting attempts to force OCaml into preemption. 
+# Log with attempts to preempt OCaml
 
 
 ## Perform effect in signal handler
