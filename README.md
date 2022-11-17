@@ -15,19 +15,18 @@ Something that works here is to call `finalise_release` and re-enter the schedul
 
 OCaml does not actually run the signal handlers as they happen. Runtime signal handler puts the signals into pending actions, which are then executed from safepoint. Thus, try to override runtime handler, and throw effect from the frame set up by OS. The benefit here is that the important OCaml registers are still there. Requires a little inline asm to put effect where `caml_perform` expects it. 
 
-Effect gets caught, but continuation doesn't work. 
+This **somewhat works**. Allocation inside handler breaks things, but if there's no allocations, it's not survives 70-800 perform-continue cycles before segfault. Further, the segfaults seem to happen due to signal arriving during OCaml's runtime logic. 
 
-The nice part here is that returning from C signal-frame after resumption is set up by OS, so it's going to be fine. The not so nice are: 
-* We're jumping back into C frame on resumption, so yeah - not quite something `caml_resume` was made for. 
-* What happens when the signal is handled over a C frame (and important ocaml registers are not set)?
+
+The good part here is that we make good use of OS-provided signal-frame. The sig handler gets called with mostly-OCaml-valid registers, we immediately jump into OCaml code, then on the way back, we just need to survive until end of signal-frame (afterwards pre-signal registers are restored). Still, if allocating inside effect handler segfaults, something must be getting mangled in the minimal code preceding jump into asm.
 
 ## Perform effect in true signal handler after calling back into OCaml
 
 Do all above, but don't try to perform effect from C. Instead, call OCaml closure performing an effect by invoking `caml_callback_asm` (to skip the pesky handlers-removing code). Here, resumption should not be this much different from normal order of things.
 
-**Works** (unless you allocate in the handler logic). Overall pretty promising given the amount of hackery. It fails quickly with gc error (`allocation failure during minor GC`) if the handler allocates memory. Otherwise, it segfaults at some point and that's expected, given that we're gonna occasionally have the signal arrive during the most critical runtime code.
+**Somewhat works** but **a lot better**. Goes into many thousands of perform-continue cycles, even 1 million. Still cannot allocate in the handlers. 
 
-At some point here means anywhere between 50 to 1000 preempts. Seems like exp distribution, so a good sign. 
+Most of the failures are deadlocks, perhaps signal mismanagement? Segfaults also happen. Again, I don't think we can eliminate segfaults as long as there's no runtime-logic detection.
 
 # Not tried
 
