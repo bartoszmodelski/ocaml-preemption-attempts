@@ -32,7 +32,7 @@ Lots of the failures are deadlock that look like some signal mismanagement. Segf
 Similar in spirit to above, but we ensure that the effect is not thrown from a signal-frame constructed above runtime code, calls into C libraries, syscalls, etc.
 
 
-Reached over 30m+ perform-resume cycles before I stopped it. No segfaults witnessed. Allocations in handlers are fine. **Great success?**
+**Great success!**. Reached over 30m+ perform-resume cycles before I stopped it. No segfaults witnessed. Allocations in handlers are fine.
 
 # Other things here
 
