@@ -1,6 +1,6 @@
-Repo documenting attempts to force OCaml into preemption. 
+# Log documenting attempts to force OCaml into preemption. 
 
-# Log
+
 ## Perform effect in signal handler
 
 Unhandled effect. Runtime purposefully removes effect handlers when entering OCaml from C (handler actions are executed from safepoint). 
