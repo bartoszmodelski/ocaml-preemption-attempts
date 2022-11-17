@@ -5,6 +5,8 @@ type _ Effect.t += Yield : unit Effect.t
 
 let yield () = perform Yield
 
+let counter = ref 0
+
 let[@no_inline] with_effects_handler ~yielded_f f =
   Printf.printf "setup handlers\n";
   Stdlib.flush_all ();        
@@ -13,8 +15,7 @@ let[@no_inline] with_effects_handler ~yielded_f f =
     match e with
     | Yield -> 
       Some (fun (k : (a, unit) continuation) ->
-        (*Printf.printf "in effects handler\n";
-        Stdlib.flush_all (); *)
+        counter := !counter + 1;
         yielded_f (); continue k ())
     | _ -> 
       Printf.printf "wrong handler\n";

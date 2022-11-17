@@ -27,14 +27,14 @@ Do all above, but don't perform effect from C. Instead, call OCaml closure perfo
 
 Lots of the failures are deadlock that look like some signal mismanagement. Segfaults also happen. Again, I don't think we can eliminate segfaults as long as there's no runtime-logic detection.
 
-# Not tried
+## Perform effect from `caml_domain_external_interrupt_hook` after calling back into OCaml
 
-* Suspend domain with the busy task and spawn a new one. 
-  
-* Call back into ocaml from the last thing in ocaml gc call
+Seen it reach over 30m+ perform-resume cycles and stopped it. No segfaults witnessed. Allocations in handlers are fine.
 
-* Start a new task from signal handler allocated on a custom stack. Still the issue of entering mid gc, etc. 
+**Great success?**
+
+
 
 # Other things here
 
-* Bindings for sending signals to threads (rather than processes) mimicking the way Go does that.
+* Bindings for sending signals to threads (rather than processes), mimicking the way Go does that.

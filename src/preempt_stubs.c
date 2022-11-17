@@ -4,10 +4,14 @@
 #include <pthread.h>
 #include <signal.h>
 #include <assert.h>
+
 #include <caml/mlvalues.h>
 #include <caml/callback.h>
 #include <caml/fiber.h>
 #include <caml/domain.h>
+
+
+
 
 CAMLprim value thread_id()
 {
@@ -101,14 +105,36 @@ CAMLprim value install_handler2()
 }
 
 /* use interruptor */
+
+
 CAMLextern void (*caml_domain_external_interrupt_hook)(void);
 void (*hook_previous)(void);
 
 
 static void caml_domain_external_interrupt_hook_hacked(void)
 {
-  fprintf(stderr, "called!\n");
+  Caml_check_caml_state();
+  
+  caml_domain_state *domain_state = Caml_state;
+  assert(domain_state);
+  domain_state->requested_external_interrupt = 0;
+
+  caml_maybe_expand_stack();
+
+  caml_callback_asm(domain_state, *closure, &arg); 
+  
+  //fprintf(stderr, "called!\n");
   return;
+}
+
+
+CAMLprim value enable() {
+  set_closure();
+
+  caml_domain_state *domain_state = Caml_state;
+  assert(domain_state);
+  domain_state->requested_external_interrupt = 1;
+  caml_interrupt_self();
 }
 
 
@@ -116,6 +142,8 @@ CAMLprim value install_handler3()
 {
   hook_previous = caml_domain_external_interrupt_hook;
   caml_domain_external_interrupt_hook = caml_domain_external_interrupt_hook_hacked;
+
+  enable();
 
   return Val_unit;
 }

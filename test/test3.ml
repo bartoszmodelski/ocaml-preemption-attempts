@@ -2,7 +2,6 @@ let () =
   let id = Atomic.make None in
   let write_something = Atomic.make false in
   let counter = ref 0 in 
-
   (* thr 1 *)
   let domain =
     Domain.spawn (fun () ->
