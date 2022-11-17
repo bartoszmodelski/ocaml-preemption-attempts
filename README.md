@@ -23,7 +23,7 @@ The good part here is that we make use of OS-provided signal-frame. The sig hand
 
 Do all above, but don't perform effect from C. Instead, call OCaml closure performing an effect by invoking `caml_callback_asm` (to skip the pesky handlers-removing code). 
 
-**Kinda works** but **a lot better**. Goes into many thousands of perform-continue cycles, even nearing 1 million. Still cannot allocate in the handlers. 
+**Kinda works** but **significantly better**. Goes into many thousands of perform-continue cycles, even nearing 1 million. Still cannot allocate in the handlers. 
 
 Lots of the failures are deadlock that look like some signal mismanagement. Segfaults also happen. Again, I don't think we can eliminate segfaults as long as there's no runtime-logic detection.
 
