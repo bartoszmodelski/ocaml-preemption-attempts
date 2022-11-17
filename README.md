@@ -29,10 +29,7 @@ Lots of the failures are deadlock that look like some signal mismanagement. Segf
 
 ## Perform effect from `caml_domain_external_interrupt_hook` after calling back into OCaml
 
-Seen it reach over 30m+ perform-resume cycles and stopped it. No segfaults witnessed. Allocations in handlers are fine.
-
-**Great success?**
-
+**Great success!**. Seen it reach over 30m+ perform-resume cycles and stopped it. No segfaults witnessed. Allocations in handlers are fine.
 
 
 # Other things here
